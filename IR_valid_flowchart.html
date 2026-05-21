@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IR Analyzer V10 — Simple Flowchart</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #1e293b; padding: 40px 20px; }
+
+h1 { text-align: center; font-size: 22px; color: #1e40af; margin-bottom: 4px; }
+.sub { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 40px; }
+
+/* FLOW WRAPPER */
+.flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+/* SHAPES */
+.rect {
+  background: #fff; border: 2px solid var(--c, #3b82f6);
+  border-radius: 8px; padding: 12px 28px;
+  font-size: 13px; font-weight: 600; color: #1e293b;
+  text-align: center; min-width: 280px; max-width: 420px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.rect.filled { background: var(--c); color: #fff; }
+
+.diamond {
+  background: #fff; border: 2px solid #f59e0b;
+  padding: 12px 32px; font-size: 13px; font-weight: 600;
+  color: #92400e; text-align: center;
+  border-radius: 50px; min-width: 280px; max-width: 420px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.arrow { font-size: 22px; color: #94a3b8; line-height: 1.4; text-align: center; }
+.arrow-label { font-size: 11px; color: #64748b; font-style: italic; margin: 1px 0; }
+
+/* BRANCHES */
+.branch-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 4px 0; }
+.branch-col { display: flex; flex-direction: column; align-items: center; }
+.b-label { font-size: 11px; font-weight: bold; margin: 3px 0; }
+.vline { width: 2px; height: 16px; background: #cbd5e1; }
+
+/* OUTCOME BOXES */
+.outcome {
+  padding: 8px 16px; border-radius: 6px; font-size: 12px;
+  font-weight: bold; text-align: center; min-width: 140px;
+  border: 2px solid var(--c); background: var(--bg); color: var(--fg);
+}
+
+/* SECTION DIVIDER */
+.sec { width: 100%; max-width: 700px; margin: 36px auto 16px;
+  font-size: 15px; font-weight: bold; color: #1e40af;
+  border-bottom: 2px solid #bfdbfe; padding-bottom: 6px; }
+
+/* CASE CARDS */
+.cases { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 800px; margin: 0 auto; }
+.case { background: #fff; border-radius: 10px; padding: 16px;
+  border-left: 4px solid var(--c); box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+.case-title { font-size: 13px; font-weight: bold; color: var(--c); margin-bottom: 6px; }
+.case-when { font-size: 11px; color: #64748b; margin-bottom: 10px; font-style: italic; }
+.case-rule { font-size: 12px; color: #374151; padding: 3px 0;
+  display: flex; gap: 6px; align-items: flex-start; border-bottom: 1px solid #f1f5f9; }
+.case-rule:last-child { border-bottom: none; }
+.dot { min-width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c); margin-top: 4px; }
+
+/* CLASSIFY TABLE */
+.ctable { width: 100%; max-width: 700px; margin: 0 auto;
+  border-collapse: collapse; font-size: 13px; }
+.ctable th { background: #1e40af; color: #fff; padding: 10px 14px; text-align: left; }
+.ctable td { padding: 9px 14px; border-bottom: 1px solid #e2e8f0; background: #fff; }
+.ctable tr:nth-child(even) td { background: #f8fafc; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>IR Analyzer V10 — Simple Flowchart</h1>
+<p class="sub">ir_analyzer_v10.py</p>
+
+<!-- ════════ SECTION 1: MAIN FLOW ════════ -->
+<p class="sec">1. MAIN FLOW</p>
+
+<div class="flow">
+
+  <div class="rect filled" style="--c:#1e40af">START — Run Script</div>
+  <div class="arrow">↓</div>
+
+  <div class="rect" style="--c:#3b82f6">Scan all folders recursively<br><small style="font-weight:400;color:#64748b">os.walk() → collect all .docx files</small></div>
+  <div class="arrow">↓</div>
+
+  <div class="rect" style="--c:#3b82f6">Group files by PR folder</div>
+  <div class="arrow">↓</div>
+
+  <div class="diamond">How many files in this PR folder?</div>
+
+  <div class="branch-row">
+    <div class="branch-col">
+      <div class="b-label" style="color:#3b82f6">1 File</div>
+      <div class="vline"></div>
+      <div class="outcome" style="--c:#3b82f6; --bg:#eff6ff; --fg:#1e40af">Process directly</div>
+    </div>
+    <div class="branch-col">
+      <div class="b-label" style="color:#f59e0b">2 Files</div>
+      <div class="vline"></div>
+      <div class="outcome" style="--c:#f59e0b; --bg:#fffbeb; --fg:#92400e">Apply Case Rules<br><small>(see Section 2)</small></div>
+    </div>
+    <div class="branch-col">
+      <div class="b-label" style="color:#f97316">3+ Files</div>
+      <div class="vline"></div>
+      <div class="outcome" style="--c:#f97316; --bg:#fff7ed; --fg:#9a3412">Process each<br>individually</div>
+    </div>
+  </div>
+
+  <div class="arrow">↓ (all paths)</div>
+
+  <div class="rect" style="--c:#7c3aed">Analyze document<br><small style="font-weight:400;color:#64748b">Read paragraphs → tables → headers/footers → XML fallback if empty</small></div>
+  <div class="arrow">↓</div>
+
+  <div class="rect" style="--c:#7c3aed">Detect PART/OBS + Language %<br><small style="font-weight:400;color:#64748b">PART must be at START of paragraph (v10 fix)</small></div>
+  <div class="arrow">↓</div>
+
+  <div class="rect" style="--c:#7c3aed">Classify file → assign category<br><small style="font-weight:400;color:#64748b">(see Section 3)</small></div>
+  <div class="arrow">↓</div>
+
+  <div class="rect" style="--c:#059669">Copy to output folder<br><small style="font-weight:400;color:#64748b">Category / PR-XXXXX / filename.docx</small></div>
+  <div class="arrow">↓</div>
+
+  <div class="rect" style="--c:#059669">Write row to Excel + update metrics</div>
+  <div class="arrow">↓</div>
+
+  <div class="diamond">Every 10 files processed?</div>
+  <div class="branch-row">
+    <div class="branch-col">
+      <div class="b-label" style="color:#059669">YES</div>
+      <div class="vline"></div>
+      <div class="outcome" style="--c:#059669; --bg:#f0fdf4; --fg:#065f46">Save Excel → Copy to View file</div>
+    </div>
+    <div class="branch-col">
+      <div class="b-label" style="color:#94a3b8">NO</div>
+      <div class="vline"></div>
+      <div class="outcome" style="--c:#94a3b8; --bg:#f8fafc; --fg:#475569">Next PR folder</div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+  <div class="rect filled" style="--c:#1e40af">END — Final save + PROCESSING COMPLETE</div>
+
+</div>
+
+<!-- ════════ SECTION 2: TWO FILE CASES ════════ -->
+<p class="sec">2. TWO-FILE PR — 4 CASE RULES</p>
+
+<div class="cases">
+
+  <div class="case" style="--c:#ef4444">
+    <div class="case-title">CASE 4</div>
+    <div class="case-when">Both filenames have "draft" or "dir"</div>
+    <div class="case-rule"><div class="dot"></div>f1 → Same Content</div>
+    <div class="case-rule"><div class="dot"></div>f2 → Draft IR</div>
+  </div>
+
+  <div class="case" style="--c:#f97316">
+    <div class="case-title">CASE 3</div>
+    <div class="case-when">Either file has non-English content<br>(Hindi / Malayalam / Tamil / etc)</div>
+    <div class="case-rule"><div class="dot"></div>Both files → main classification</div>
+    <div class="case-rule"><div class="dot"></div>Each gets its own category</div>
+    <div class="case-rule"><div class="dot"></div>No Same Content logic</div>
+  </div>
+
+  <div class="case" style="--c:#3b82f6">
+    <div class="case-title">CASE 2</div>
+    <div class="case-when">One filename has "draft" or "dir" (English files)</div>
+    <div class="case-rule"><div class="dot"></div>Draft file → Same Content</div>
+    <div class="case-rule"><div class="dot"></div>Other file → main classification</div>
+  </div>
+
+  <div class="case" style="--c:#059669">
+    <div class="case-title">CASE 1</div>
+    <div class="case-when">No draft/dir in either filename (both English)</div>
+    <div class="case-rule"><div class="dot"></div>Both IR Valid → both → IR File Valid</div>
+    <div class="case-rule"><div class="dot"></div>Only one IR Valid → IR Valid → IR File Valid, other → Same Content</div>
+    <div class="case-rule"><div class="dot"></div>Neither IR Valid → each → own category</div>
+  </div>
+
+</div>
+
+<!-- ════════ SECTION 3: CLASSIFY ════════ -->
+<p class="sec">3. CLASSIFICATION RULES</p>
+
+<table class="ctable">
+  <thead>
+    <tr><th>Condition (checked in order)</th><th>PART / OBS</th><th>→ Category</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>"draft" or "dir" in filename</td><td>Any</td>
+      <td><span class="tag" style="background:#fee2e2;color:#991b1b">Draft IR</span></td>
+    </tr>
+    <tr>
+      <td>Hindi words detected</td><td>✅ Yes</td>
+      <td><span class="tag" style="background:#fef3c7;color:#92400e">Hindi File</span></td>
+    </tr>
+    <tr>
+      <td>Hindi words detected</td><td>❌ No</td>
+      <td><span class="tag" style="background:#f1f5f9;color:#475569">Other File</span></td>
+    </tr>
+    <tr>
+      <td>Malayalam words detected</td><td>✅ Yes</td>
+      <td><span class="tag" style="background:#d1fae5;color:#065f46">Malayalam File</span></td>
+    </tr>
+    <tr>
+      <td>Malayalam words detected</td><td>❌ No</td>
+      <td><span class="tag" style="background:#f1f5f9;color:#475569">Other File</span></td>
+    </tr>
+    <tr>
+      <td>Tamil / Telugu / Kannada / Bengali / Gujarati / Punjabi</td><td>✅ Yes</td>
+      <td><span class="tag" style="background:#ede9fe;color:#4c1d95">Other Indian Language File</span></td>
+    </tr>
+    <tr>
+      <td>Tamil / Telugu / Kannada / Bengali / Gujarati / Punjabi</td><td>❌ No</td>
+      <td><span class="tag" style="background:#f1f5f9;color:#475569">Other File</span></td>
+    </tr>
+    <tr>
+      <td>Pure English — no Indian language</td><td>✅ Yes</td>
+      <td><span class="tag" style="background:#dcfce7;color:#14532d">IR File Valid ✓</span></td>
+    </tr>
+    <tr>
+      <td>Pure English — no Indian language</td><td>❌ No</td>
+      <td><span class="tag" style="background:#f1f5f9;color:#475569">Other File</span></td>
+    </tr>
+    <tr>
+      <td>File fails to open / read error</td><td>—</td>
+      <td><span class="tag" style="background:#fee2e2;color:#7f1d1d">Failed File</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<br><br>
+<p style="text-align:center;color:#94a3b8;font-size:12px">IR Analyzer V10 · CAG Phase 2</p>
+
+</body>
+</html>
